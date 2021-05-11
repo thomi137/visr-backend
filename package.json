@@ -1,0 +1,25 @@
+{
+  "name": "visr-backend",
+  "version": "1.0.0",
+  "description": "Backend for visr clients",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomi137/visr-backend.git"
+  },
+  "keywords": [
+    "backend",
+    "firebase",
+    "cloud-vision",
+    "image-tagging"
+  ],
+  "author": "Thomas Prosser",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thomi137/visr-backend/issues"
+  },
+  "homepage": "https://github.com/thomi137/visr-backend#readme"
+}
