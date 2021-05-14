@@ -32,7 +32,8 @@
     "express-jwt": "^6.0.0",
     "firebase-admin": "^9.8.0",
     "jwks-rsa": "^2.0.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2"
   },
   "devDependencies": {
     "dotenv": "^9.0.2",
