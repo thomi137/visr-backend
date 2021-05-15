@@ -25,6 +25,7 @@
   "homepage": "https://github.com/thomi137/visr-backend#readme",
   "dependencies": {
     "@google-cloud/storage": "^5.8.5",
+    "@google-cloud/vision": "^2.3.2",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",

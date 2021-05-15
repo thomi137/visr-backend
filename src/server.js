@@ -45,7 +45,7 @@ const imageRoutes = require('./images/images');
 app.use('/images', imageRoutes(firebaseAdmin));
 
 app.get('/ping', async (req, res) => {
-    res.json('pong');
+    res.status(418).json({ message: 'pong' });
 });
 
 
