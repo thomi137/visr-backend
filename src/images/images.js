@@ -1,5 +1,7 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
+const _ = require('lodash');
 const { format } = require('util');
 const Multer = require('multer');
 
@@ -46,6 +48,23 @@ module.exports = (firebaseAdmin) => {
         }
     });
 
+    router.patch('/:id', async (req, res, next) => {
+        const id = req.params.id;
+        const body = req.body
+        if(_.isEmpty(body)) {
+            res.status(204).send()
+        }
+        try {
+            const docRef = datastore.collection('images').doc(id);
+            await docRef.set(body, {merge: true});
+            const updatedDoc = await docRef.get();
+            res.json(updatedDoc.data());
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({message: error.message});
+        }
+    });
+
     router.post('/upload', multer.single('file'), async (req, res, next) => {
         
         try {
@@ -56,8 +75,12 @@ module.exports = (firebaseAdmin) => {
                     message: 'No file uploaded'
                 });
             } else {
-           
-                const blob = bucket.file(req.file.originalname);
+                const docRef = datastore.collection('images').doc();
+                const id = docRef.id;
+                const ext = path.extname(req.file.originalname);
+                const savedFilename = `${id}${ext}`;
+
+                const blob = bucket.file(savedFilename);
                 const blobStream = blob.createWriteStream();
                 blobStream.on('error', err => {
                     next(err);
@@ -66,28 +89,43 @@ module.exports = (firebaseAdmin) => {
                 blobStream.on('finish', async () => {
                     // The public URL can be used to directly access the file via HTTP.
                     const publicUrl = format(
-                      `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+                      `https://storage.googleapis.com/${bucket.name}/${savedFilename}`
                     );
                   
                     await blob.makePublic();
-                    const wRes = await datastore.collection('images').add({
-                        name: blob.name,
-                        url: publicUrl
-                    });
+                    const imageData = {
+                        id,
+                        title: req.file.originalname,
+                        savedFilename,
+                        publicUrl
+                    }
+                    const wRes = await docRef.set(imageData);
                     console.log(wRes);
-                    res.status(200).json({ 
-                        publicUrl,
-                        id: wRes.id,
-                        path: wRes.path 
-                    });
+                    res.status(200).json(imageData);
                   });
                 
                   blobStream.end(req.file.buffer);
     
             }
-        } catch (err) {
-            res.status(500).send(err);
+        } catch (error) {
+            res.status(500).send({message: error.message});
         }
+    });
+
+    router.delete('/:id', async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const snapshot = await datastore.collection('images').doc(id).get();
+            const fileName = snapshot.data().savedFilename;
+            await bucket.file(fileName).delete();
+            await datastore.collection('images').doc(id).delete()
+            res.status(200).json({message: `Image ${id} deleted.`})
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({message: error.message});
+        }
+
     });
 
     return router;
