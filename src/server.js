@@ -42,7 +42,9 @@ firebaseAdmin.initializeApp({
 // Routes
 // https://stackoverflow.com/questions/51899990/pass-object-to-routes-file-used-as-middleware-in-nodejs
 const imageRoutes = require('./images/images');
+const annotatorRoutes = require('./images/annotate');
 app.use('/images', imageRoutes(firebaseAdmin));
+app.use('/annotate', annotatorRoutes(firebaseAdmin))
 
 app.get('/ping', async (req, res) => {
     res.status(418).json({ message: 'pong' });
